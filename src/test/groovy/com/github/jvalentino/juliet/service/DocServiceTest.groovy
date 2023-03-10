@@ -3,6 +3,7 @@ package com.github.jvalentino.juliet.service
 import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.entity.Doc
 import com.github.jvalentino.juliet.entity.DocVersion
+import com.github.jvalentino.juliet.repo.AuthUserRepo
 import com.github.jvalentino.juliet.repo.DocRepo
 import com.github.jvalentino.juliet.repo.DocVersionRepo
 import com.github.jvalentino.juliet.service.DocService
@@ -21,6 +22,7 @@ class DocServiceTest extends Specification {
         subject.with {
             docRepo = Mock(DocRepo)
             docVersionRepo = Mock(DocVersionRepo)
+            authUserRepo = Mock(AuthUserRepo)
         }
     }
 
@@ -41,12 +43,19 @@ class DocServiceTest extends Specification {
         MultipartFile file = GroovyMock()
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
 
+        and:
+        Optional<AuthUser> optional = GroovyMock()
+
         when:
-        DocVersion result = subject.uploadNewDoc(user, file, date)
+        DocVersion result = subject.uploadNewDoc(user.authUserId, file, date)
 
         then:
         _ * file.originalFilename >> 'alpha.pdf'
         _ * file.bytes >> 'bravo'.bytes
+
+        and:
+        1 * subject.authUserRepo.findById(user.authUserId) >> optional
+        1 * optional.get() >> user
 
         and:
         1 * subject.docRepo.save(_) >> { Doc doc ->
@@ -97,12 +106,19 @@ class DocServiceTest extends Specification {
         Optional optional = GroovyMock()
         Doc parentDoc = new Doc()
 
+        and:
+        Optional<AuthUser> optionalUser = GroovyMock()
+
         when:
-        DocVersion result = subject.uploadNewVersion(user, file, date, docId)
+        DocVersion result = subject.uploadNewVersion(user.authUserId, file, date, docId)
 
         then:
         _ * file.originalFilename >> 'alpha.pdf'
         _ * file.bytes >> 'bravo'.bytes
+
+        and:
+        1 * subject.authUserRepo.findById(user.authUserId) >> optionalUser
+        1 * optionalUser.get() >> user
 
         and:
         1 * subject.docVersionRepo.countForDoc(docId) >> 2

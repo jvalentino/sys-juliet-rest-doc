@@ -22,10 +22,15 @@ class ViewVersionControllerIntgTest extends BaseIntg {
 
     def "test versions"() {
         given:
-        this.mockAdminLoggedIn()
-
-        and:
-        AuthUser user = authUserRepo.findAdminUser('admin').first()
+        AuthUser user = new AuthUser()
+        user.with {
+            email = 'admin'
+            password = 'admin'
+            salt = 'admin'
+            firstName = 'admin'
+            lastName = 'admin'
+        }
+        this.entityManager.persist(user)
 
         Doc doc = new Doc()
         doc.with {
@@ -62,10 +67,15 @@ class ViewVersionControllerIntgTest extends BaseIntg {
 
     def "test download version"() {
         given:
-        this.mockAdminLoggedIn()
-
-        and:
-        AuthUser user = authUserRepo.findAdminUser('admin').first()
+        AuthUser user = new AuthUser()
+        user.with {
+            email = 'admin'
+            password = 'admin'
+            salt = 'admin'
+            firstName = 'admin'
+            lastName = 'admin'
+        }
+        this.entityManager.persist(user)
 
         Doc doc = new Doc()
         doc.with {

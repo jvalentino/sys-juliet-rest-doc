@@ -11,9 +11,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class DashboardRestIntgTest extends BaseIntg {
 
     def "test dashboard"() {
-        given:
-        this.mockAdminLoggedIn()
-
         when:
         MvcResult response = mvc.perform(
                 get("/dashboard"))
@@ -24,17 +21,6 @@ class DashboardRestIntgTest extends BaseIntg {
         then:
         DashboardDto result = this.toObject(response, DashboardDto)
         result.documents.size() == 0
-    }
-
-    def "test dashboard no auth"() {
-        when:
-        MvcResult response = mvc.perform(
-                get("/dashboard"))
-                .andDo(print())
-                .andReturn()
-
-        then:
-        response.response.status == 403
     }
 
 }

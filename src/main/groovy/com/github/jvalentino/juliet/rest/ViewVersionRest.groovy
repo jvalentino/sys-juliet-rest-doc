@@ -3,10 +3,8 @@ package com.github.jvalentino.juliet.rest
 import com.github.jvalentino.juliet.dto.ResultDto
 import com.github.jvalentino.juliet.dto.ViewVersionDto
 import com.github.jvalentino.juliet.util.DateGenerator
-import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.entity.DocVersion
 import com.github.jvalentino.juliet.service.DocService
-import com.github.jvalentino.juliet.service.UserService
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,8 +32,8 @@ class ViewVersionRest {
     @Autowired
     DocService docService
 
-    @Autowired
-    UserService userService
+    //@Autowired
+    //UserService userService
 
     @GetMapping('/view-versions/{docId}')
     ViewVersionDto index(@PathVariable(value='docId') Long docId) {
@@ -69,11 +67,12 @@ class ViewVersionRest {
         }
     }
 
-    @PostMapping('/version/new/{docId}')
-    ResultDto upload(@RequestParam('file') MultipartFile file, @PathVariable(value='docId') Long docId) {
-        AuthUser user = userService.currentLoggedInUser()
+    @PostMapping('/version/new/{docId}/{userId}')
+    ResultDto upload(@RequestParam('file') MultipartFile file, @PathVariable(value='docId') Long docId,
+                     @PathVariable(value='userId') Long userId) {
+        //AuthUser user = userService.currentLoggedInUser()
 
-        docService.uploadNewVersion(user, file, DateGenerator.date(), docId)
+        docService.uploadNewVersion(userId, file, DateGenerator.date(), docId)
 
         new ResultDto()
     }

@@ -41,12 +41,6 @@ abstract class BaseIntg extends Specification {
     EntityManager entityManager
 
 
-    void mockAdminLoggedIn() {
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken('1', null)
-        SecurityContextHolder.getContext().setAuthentication(authentication)
-    }
-
     Object toObject(MvcResult response, Class clazz) {
         String json = response.getResponse().getContentAsString()
         new ObjectMapper().readValue(json, clazz)

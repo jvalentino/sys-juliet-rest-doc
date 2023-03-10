@@ -21,15 +21,22 @@ class DocServiceIntgTest extends BaseIntg {
 
     def "test uploadNewDoc"() {
         given:
-        this.mockAdminLoggedIn()
-        AuthUser user = authUserRepo.findAdminUser('admin').first()
+        AuthUser user = new AuthUser()
+        user.with {
+            email = 'admin'
+            password = 'admin'
+            salt = 'admin'
+            firstName = 'admin'
+            lastName = 'admin'
+        }
+        this.entityManager.persist(user)
 
         and:
         MultipartFile file = GroovyMock()
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
 
         when:
-        DocVersion result = docService.uploadNewDoc(user, file, date)
+        DocVersion result = docService.uploadNewDoc(user.authUserId, file, date)
 
         then:
         _ * file.originalFilename >> 'alpha.pdf'
@@ -44,8 +51,15 @@ class DocServiceIntgTest extends BaseIntg {
 
     def "test uploadNewVersion"() {
         given:
-        this.mockAdminLoggedIn()
-        AuthUser user = authUserRepo.findAdminUser('admin').first()
+        AuthUser user = new AuthUser()
+        user.with {
+            email = 'admin'
+            password = 'admin'
+            salt = 'admin'
+            firstName = 'admin'
+            lastName = 'admin'
+        }
+        this.entityManager.persist(user)
 
         and:
         Doc doc = new Doc()
@@ -64,7 +78,7 @@ class DocServiceIntgTest extends BaseIntg {
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
 
         when:
-        DocVersion result = docService.uploadNewVersion(user, file, date, doc.docId)
+        DocVersion result = docService.uploadNewVersion(user.authUserId, file, date, doc.docId)
 
         then:
         _ * file.originalFilename >> 'alpha.txt'

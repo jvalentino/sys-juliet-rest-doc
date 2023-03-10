@@ -4,7 +4,6 @@ import com.github.jvalentino.juliet.dto.ResultDto
 import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.rest.UploadRest
 import com.github.jvalentino.juliet.service.DocService
-import com.github.jvalentino.juliet.service.UserService
 import com.github.jvalentino.juliet.util.DateGenerator
 import com.github.jvalentino.juliet.util.DateUtil
 import org.springframework.web.multipart.MultipartFile
@@ -19,7 +18,6 @@ class UploadRestTest extends Specification {
     def setup() {
         subject = new UploadRest()
         subject.with {
-            userService = Mock(UserService)
             docService = Mock(DocService)
         }
         GroovyMock(DateGenerator, global:true)
@@ -29,15 +27,14 @@ class UploadRestTest extends Specification {
         given:
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
         MultipartFile file = GroovyMock()
-        AuthUser user = Mock()
+        Long userId = 1L
 
         when:
-        ResultDto result = subject.upload(file)
+        ResultDto result = subject.upload(file, userId)
 
         then:
         1 * DateGenerator.date() >> date
-        1 * subject.userService.currentLoggedInUser() >> user
-        1 * subject.docService.uploadNewDoc(user, file, date)
+        1 * subject.docService.uploadNewDoc(userId, file, date)
 
         and:
         result.success

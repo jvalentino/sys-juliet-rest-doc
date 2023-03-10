@@ -3,6 +3,7 @@ package com.github.jvalentino.juliet.service
 import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.entity.Doc
 import com.github.jvalentino.juliet.entity.DocVersion
+import com.github.jvalentino.juliet.repo.AuthUserRepo
 import com.github.jvalentino.juliet.repo.DocRepo
 import com.github.jvalentino.juliet.repo.DocVersionRepo
 import groovy.transform.CompileDynamic
@@ -28,11 +29,15 @@ class DocService {
     @Autowired
     DocVersionRepo docVersionRepo
 
+    @Autowired
+    AuthUserRepo authUserRepo
+
     Long countDocuments() {
         docRepo.count()
     }
 
-    DocVersion uploadNewDoc(AuthUser user, MultipartFile file, Date date) {
+    DocVersion uploadNewDoc(Long userId, MultipartFile file, Date date) {
+        AuthUser user = authUserRepo.findById(userId).get()
         String ext = file.originalFilename.split('\\.').last()
 
         Doc parentDoc = new Doc()
@@ -72,7 +77,8 @@ class DocService {
         version
     }
 
-    DocVersion uploadNewVersion(AuthUser user, MultipartFile file, Date date, Long docId) {
+    DocVersion uploadNewVersion(Long userId, MultipartFile file, Date date, Long docId) {
+        AuthUser user = authUserRepo.findById(userId).get()
         long currentCount = docVersionRepo.countForDoc(docId)
 
         Doc parentDoc = docRepo.findById(docId).get()
