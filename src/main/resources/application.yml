@@ -1,4 +1,5 @@
 management:
+  apikey: 123
   health:
     circuitbreakers:
       enabled: 'true'

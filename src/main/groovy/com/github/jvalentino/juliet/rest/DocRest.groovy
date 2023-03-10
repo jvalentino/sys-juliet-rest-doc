@@ -11,6 +11,9 @@ import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -32,15 +35,21 @@ class DocRest {
     @Autowired
     DocService docService
 
-    @GetMapping('/doc/all')
+    @Value('${management.apikey}')
+    String apikey
+
+    @GetMapping('/doc/all/apikey/{apikey}')
     @CircuitBreaker(name = 'DocAll')
-    DocListDto dashboard() {
+    ResponseEntity<DocListDto> dashboard(@PathVariable(value='apikey') String apikey) {
+        if (this.isInvalidKey(apikey)) {
+            return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED)
+        }
         DocListDto dashboard = new DocListDto()
         dashboard.with {
             documents = docService.allDocs()
         }
 
-        dashboard
+        new ResponseEntity<DocListDto>(dashboard, HttpStatus.OK)
     }
 
     @CircuitBreaker(name = 'DocUpload')
@@ -91,6 +100,10 @@ class DocRest {
         docService.uploadNewVersion(userId, file, DateGenerator.date(), docId)
 
         new ResultDto()
+    }
+
+    protected boolean isInvalidKey(String key) {
+        key != apikey
     }
 
 }

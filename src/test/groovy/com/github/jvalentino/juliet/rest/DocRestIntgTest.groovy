@@ -19,7 +19,7 @@ class DocRestIntgTest extends BaseIntg {
     def "test dashboard"() {
         when:
         MvcResult response = mvc.perform(
-                get("/doc/all"))
+                get("/doc/all/apikey/123"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
