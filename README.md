@@ -219,6 +219,10 @@ java -jar -Dspring.datasource.url=jdbc:postgresql://pg-primary-postgresql:5432/e
 
 ## OpenAPI
 
+> The OpenAPI Specification, previously known as the Swagger Specification, is a specification for a machine-readable interface definition language for describing, producing, consuming and visualizing RESTful web services
+
+- https://en.wikipedia.org/wiki/OpenAPI_Specification
+
 The only reason this was more than once step, is because I had overridden the default JSON converter to handle hibernate entities, which messed it up for Swagger. The result was a series of workarounds.
 
 ### build.gradle
@@ -285,3 +289,212 @@ This is done to have Swagger use the YAML endpoint instead of the JSON one, beca
 The result of all this magic is that you can now get to http://localhost:8080/swagger-ui/index.html, and see:
 
 ![01](wiki/swagger.png)
+
+## Resilience4j
+
+> Resilience4j is a lightweight fault tolerance library designed for functional programming. Resilience4j provides higher-order functions (decorators) to enhance any functional interface, lambda expression or method reference with a Circuit Breaker, Rate Limiter, Retry or Bulkhead. You can stack more than one decorator on any functional interface, lambda expression or method reference. The advantage is that you have the choice to select the decorators you need and nothing else.
+
+- https://resilience4j.readme.io/docs
+
+### build.gradle
+
+```groovy
+// Circuit Breaker (Hystrix Replacement)
+	implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot2', version: '1.7.0'
+```
+
+### DocRest (Controller)
+
+```groovy
+@GetMapping('/doc/all')
+    @CircuitBreaker(name = 'DocAll')
+    DocListDto dashboard() {
+        DocListDto dashboard = new DocListDto()
+        dashboard.with {
+            documents = docService.allDocs()
+        }
+
+        dashboard
+    }
+    
+    //....
+```
+
+You want to annotate every endpoint with a name.
+
+### application.yml
+
+```yaml
+management:
+  health:
+    circuitbreakers:
+      enabled: 'true'
+    ratelimiters:
+      enabled: 'true'
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+--- More stuff...
+resilience4j:
+  circuitbreaker:
+    instances:
+      DocAll:
+        registerHealthIndicator: true
+        ringBufferSizeInClosedState: 5
+        ringBufferSizeInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        maxRetryAttempts: 3
+        waitDuration: 5000
+      DocUpload:
+        registerHealthIndicator: true
+        ringBufferSizeInClosedState: 5
+        ringBufferSizeInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        maxRetryAttempts: 3
+        waitDuration: 5000
+      DocVersions:
+        registerHealthIndicator: true
+        ringBufferSizeInClosedState: 5
+        ringBufferSizeInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        maxRetryAttempts: 3
+        waitDuration: 5000
+      DocDownload:
+        registerHealthIndicator: true
+        ringBufferSizeInClosedState: 5
+        ringBufferSizeInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        maxRetryAttempts: 3
+        waitDuration: 5000
+      DocVersionNew:
+        registerHealthIndicator: true
+        ringBufferSizeInClosedState: 5
+        ringBufferSizeInHalfOpenState: 3
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        maxRetryAttempts: 3
+        waitDuration: 5000
+```
+
+You then declare the settings for each endpoint.
+
+### /actuator/health
+
+```json
+{
+   "status":"UP",
+   "components":{
+      "circuitBreakers":{
+         "status":"UP",
+         "details":{
+            "DocVersionNew":{
+               "status":"UP",
+               "details":{
+                  "failureRate":"-1.0%",
+                  "failureRateThreshold":"50.0%",
+                  "slowCallRate":"-1.0%",
+                  "slowCallRateThreshold":"100.0%",
+                  "bufferedCalls":0,
+                  "slowCalls":0,
+                  "slowFailedCalls":0,
+                  "failedCalls":0,
+                  "notPermittedCalls":0,
+                  "state":"CLOSED"
+               }
+            },
+            "DocDownload":{
+               "status":"UP",
+               "details":{
+                  "failureRate":"-1.0%",
+                  "failureRateThreshold":"50.0%",
+                  "slowCallRate":"-1.0%",
+                  "slowCallRateThreshold":"100.0%",
+                  "bufferedCalls":0,
+                  "slowCalls":0,
+                  "slowFailedCalls":0,
+                  "failedCalls":0,
+                  "notPermittedCalls":0,
+                  "state":"CLOSED"
+               }
+            },
+            "DocVersions":{
+               "status":"UP",
+               "details":{
+                  "failureRate":"-1.0%",
+                  "failureRateThreshold":"50.0%",
+                  "slowCallRate":"-1.0%",
+                  "slowCallRateThreshold":"100.0%",
+                  "bufferedCalls":0,
+                  "slowCalls":0,
+                  "slowFailedCalls":0,
+                  "failedCalls":0,
+                  "notPermittedCalls":0,
+                  "state":"CLOSED"
+               }
+            },
+            "DocUpload":{
+               "status":"UP",
+               "details":{
+                  "failureRate":"-1.0%",
+                  "failureRateThreshold":"50.0%",
+                  "slowCallRate":"-1.0%",
+                  "slowCallRateThreshold":"100.0%",
+                  "bufferedCalls":0,
+                  "slowCalls":0,
+                  "slowFailedCalls":0,
+                  "failedCalls":0,
+                  "notPermittedCalls":0,
+                  "state":"CLOSED"
+               }
+            },
+            "DocAll":{
+               "status":"UP",
+               "details":{
+                  "failureRate":"-1.0%",
+                  "failureRateThreshold":"50.0%",
+                  "slowCallRate":"-1.0%",
+                  "slowCallRateThreshold":"100.0%",
+                  "bufferedCalls":0,
+                  "slowCalls":0,
+                  "slowFailedCalls":0,
+                  "failedCalls":0,
+                  "notPermittedCalls":0,
+                  "state":"CLOSED"
+               }
+            }
+         }
+      },
+      "db":{
+         "status":"UP",
+         "details":{
+            "database":"PostgreSQL",
+            "validationQuery":"isValid()"
+         }
+      },
+      "diskSpace":{
+         "status":"UP",
+         "details":{
+            "total":494384795648,
+            "free":356838473728,
+            "threshold":10485760,
+            "exists":true
+         }
+      },
+      "ping":{
+         "status":"UP"
+      },
+      "rateLimiters":{
+         "status":"UNKNOWN"
+      }
+   }
+}
+```
+

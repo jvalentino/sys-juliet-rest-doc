@@ -30,6 +30,9 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.15'
 	implementation 'org.springdoc:springdoc-openapi-groovy:1.6.15'
 
+	// Circuit Breaker (Hystrix Replacement)
+	implementation group: 'io.github.resilience4j', name: 'resilience4j-spring-boot2', version: '1.7.0'
+
 	// Spring Boot Magic
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'

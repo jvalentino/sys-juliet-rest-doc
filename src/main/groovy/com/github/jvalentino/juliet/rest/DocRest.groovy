@@ -9,6 +9,7 @@ import com.github.jvalentino.juliet.service.DocService
 import com.github.jvalentino.juliet.util.DateGenerator
 import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -32,6 +33,7 @@ class DocRest {
     DocService docService
 
     @GetMapping('/doc/all')
+    @CircuitBreaker(name = 'DocAll')
     DocListDto dashboard() {
         DocListDto dashboard = new DocListDto()
         dashboard.with {
@@ -41,12 +43,14 @@ class DocRest {
         dashboard
     }
 
+    @CircuitBreaker(name = 'DocUpload')
     @PostMapping('/doc/upload/user/{userId}')
     ResultDto upload(@RequestBody DocDto file, @PathVariable(value='userId') Long userId) {
         docService.uploadNewDoc(userId, file, DateGenerator.date())
         new ResultDto()
     }
 
+    @CircuitBreaker(name = 'DocVersions')
     @GetMapping('/doc/versions/{docId}')
     ViewVersionDto versions(@PathVariable(value='docId') Long docId) {
         ViewVersionDto result = new ViewVersionDto()
@@ -60,6 +64,7 @@ class DocRest {
     }
 
     // https://www.baeldung.com/servlet-download-file
+    @CircuitBreaker(name = 'DocDownload')
     @GetMapping('/doc/version/download/{docVersionId}')
     void downloadVersion(@PathVariable(value='docVersionId') Long docVersionId, HttpServletResponse response) {
         DocVersion version = docService.retrieveVersion(docVersionId)
@@ -79,6 +84,7 @@ class DocRest {
         }
     }
 
+    @CircuitBreaker(name = 'DocVersionNew')
     @PostMapping('/doc/version/new/{docId}/user/{userId}')
     ResultDto upload(@RequestBody DocDto file, @PathVariable(value='docId') Long docId,
                      @PathVariable(value='userId') Long userId) {
