@@ -1,6 +1,6 @@
-# System Golf REST
+# System Juliet REST
 
-This application serves as the restful services as part of the overall https://github.com/jvalentino/sys-golf project. For system level details, please see that location.
+This application serves as the restful services as part of the overall https://github.com/jvalentino/sys-juliet project. For system level details, please see that location.
 
 Prerequisites
 
@@ -150,7 +150,7 @@ This script consists of the following:
 ```bash
 #!/bin/bash
 
-NAME=sys-golf-rest
+NAME=sys-juliet-rest-doc
 VERSION=latest
 HELM_NAME=backend
 
@@ -173,7 +173,7 @@ The container for running this application consists of two parts:
 ```docker
 FROM openjdk:11
 WORKDIR .
-COPY build/libs/sys-golf-rest-0.0.1.jar /usr/local/sys-golf-rest-0.0.1.jar
+COPY build/libs/sys-juliet-rest-doc-0.0.1.jar /usr/local/sys-juliet-rest-doc-0.0.1.jar
 EXPOSE 8080
 COPY config/docker/start.sh /usr/local/start.sh
 
@@ -198,7 +198,7 @@ ENTRYPOINT ["/usr/local/start.sh"]
     Match *
     Host elasticsearch-master
     Port 9200
-    Index backend
+    Index sys-rest-doc
     Suppress_Type_Name On
 ```
 
@@ -214,6 +214,74 @@ cd /opt/fluent-bit/bin
 ./fluent-bit -c fluentbit.conf > fluentbit.log 2>&1 &
 
 cd /usr/local
-java -jar -Dspring.datasource.url=jdbc:postgresql://pg-primary-postgresql:5432/examplesys sys-golf-rest-0.0.1.jar
+java -jar -Dspring.datasource.url=jdbc:postgresql://pg-primary-postgresql:5432/examplesys sys-juliet-rest-doc-0.0.1.jar
 ```
 
+## OpenAPI
+
+The only reason this was more than once step, is because I had overridden the default JSON converter to handle hibernate entities, which messed it up for Swagger. The result was a series of workarounds.
+
+### build.gradle
+
+```groovy
+implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
+implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.15'
+implementation 'org.springdoc:springdoc-openapi-groovy:1.6.15'
+```
+
+### SpringWebConfig
+
+```groovy
+@EnableWebMvc
+@Configuration
+@Slf4j
+@CompileDynamic
+@SuppressWarnings(['UnnecessarySetter'])
+class SpringWebConfig implements WebMvcConfigurer {
+
+    ObjectMapper jsonMapper() {
+        new CustomObjectMapper()
+    }
+
+    @Override
+    void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(new StringHttpMessageConverter())
+        converters.add(new MappingJackson2HttpMessageConverter(jsonMapper()))
+
+        // requires for prometheus endpoint
+        StringHttpMessageConverter converter = new StringHttpMessageConverter()
+        converter.setSupportedMediaTypes(Arrays.asList(
+                MediaType.TEXT_PLAIN,
+                new MediaType('application', 'openmetrics-text')))
+        converters.add(converter)
+
+        converters.add(new ByteArrayHttpMessageConverter())
+
+        // No converter for [class java.lang.String] with preset Content-Type
+        // 'application/openmetrics-text;version=1.0.0;charset=utf-8']
+    }
+
+}
+
+```
+
+Had to add 
+
+- `converters.add(new StringHttpMessageConverter())`
+- `converters.add(new ByteArrayHttpMessageConverter())`
+
+...which allows http://localhost:8080//v3/api-docs.yaml to render, which is important in the next step
+
+### application.properties
+
+```properties
+springdoc.swagger-ui.url=/v3/api-docs.yaml
+```
+
+This is done to have Swagger use the YAML endpoint instead of the JSON one, because we busted the JSON endpoint with our Jackson magic.
+
+### UI
+
+The result of all this magic is that you can now get to http://localhost:8080/swagger-ui/index.html, and see:
+
+![01](wiki/swagger.png)

@@ -25,6 +25,11 @@ dependencies {
 	// Groovy
 	implementation 'org.codehaus.groovy:groovy'
 
+	// Swagger
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
+	implementation 'org.springdoc:springdoc-openapi-webmvc-core:1.6.15'
+	implementation 'org.springdoc:springdoc-openapi-groovy:1.6.15'
+
 	// Spring Boot Magic
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
