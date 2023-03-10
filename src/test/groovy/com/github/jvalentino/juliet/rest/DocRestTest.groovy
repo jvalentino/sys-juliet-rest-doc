@@ -1,5 +1,6 @@
 package com.github.jvalentino.juliet.rest
 
+import com.github.jvalentino.juliet.dto.DocDto
 import com.github.jvalentino.juliet.dto.ResultDto
 import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.service.DocService
@@ -25,7 +26,7 @@ class DocRestTest extends Specification {
     def "test upload"() {
         given:
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
-        MultipartFile file = GroovyMock()
+        DocDto file = new DocDto()
         Long userId = 1L
 
         when:

@@ -1,5 +1,6 @@
 package com.github.jvalentino.juliet.service
 
+import com.github.jvalentino.juliet.dto.DocDto
 import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.entity.Doc
 import com.github.jvalentino.juliet.entity.DocVersion
@@ -40,8 +41,12 @@ class DocServiceTest extends Specification {
     def "test uploadNewDoc"() {
         given:
         AuthUser user = new AuthUser(authUserId:123L)
-        MultipartFile file = GroovyMock()
+        DocDto file = new DocDto()
+        file.fileName = 'alpha.pdf'
+        file.bytes = 'bravo'.bytes
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
+
+        //println new File("./sample.pdf").bytes
 
         and:
         Optional<AuthUser> optional = GroovyMock()
@@ -50,10 +55,6 @@ class DocServiceTest extends Specification {
         DocVersion result = subject.uploadNewDoc(user.authUserId, file, date)
 
         then:
-        _ * file.originalFilename >> 'alpha.pdf'
-        _ * file.bytes >> 'bravo'.bytes
-
-        and:
         1 * subject.authUserRepo.findById(user.authUserId) >> optional
         1 * optional.get() >> user
 
@@ -98,7 +99,9 @@ class DocServiceTest extends Specification {
     def "test uploadNewVersion"() {
         given:
         AuthUser user = new AuthUser(authUserId:123L)
-        MultipartFile file = GroovyMock()
+        DocDto file = new DocDto()
+        file.fileName = 'alpha.pdf'
+        file.bytes = 'bravo'.bytes
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
         Long docId = 1L
 
@@ -113,10 +116,6 @@ class DocServiceTest extends Specification {
         DocVersion result = subject.uploadNewVersion(user.authUserId, file, date, docId)
 
         then:
-        _ * file.originalFilename >> 'alpha.pdf'
-        _ * file.bytes >> 'bravo'.bytes
-
-        and:
         1 * subject.authUserRepo.findById(user.authUserId) >> optionalUser
         1 * optionalUser.get() >> user
 

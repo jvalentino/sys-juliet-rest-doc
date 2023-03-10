@@ -1,5 +1,6 @@
 package com.github.jvalentino.juliet.service
 
+import com.github.jvalentino.juliet.dto.DocDto
 import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.entity.Doc
 import com.github.jvalentino.juliet.entity.DocVersion
@@ -10,7 +11,6 @@ import groovy.transform.CompileDynamic
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 
 import java.sql.Timestamp
 
@@ -36,13 +36,13 @@ class DocService {
         docRepo.count()
     }
 
-    DocVersion uploadNewDoc(Long userId, MultipartFile file, Date date) {
+    DocVersion uploadNewDoc(Long userId, DocDto file, Date date) {
         AuthUser user = authUserRepo.findById(userId).get()
-        String ext = file.originalFilename.split('\\.').last()
+        String ext = file.fileName.split('\\.').last()
 
         Doc parentDoc = new Doc()
         parentDoc.with {
-            name = file.originalFilename
+            name = file.fileName
             mimeType = "application/${ext}"
             createdByUser = user
             updatedByUser = user
@@ -77,13 +77,13 @@ class DocService {
         version
     }
 
-    DocVersion uploadNewVersion(Long userId, MultipartFile file, Date date, Long docId) {
+    DocVersion uploadNewVersion(Long userId, DocDto file, Date date, Long docId) {
         AuthUser user = authUserRepo.findById(userId).get()
         long currentCount = docVersionRepo.countForDoc(docId)
 
         Doc parentDoc = docRepo.findById(docId).get()
         parentDoc.with {
-            name = file.originalFilename
+            name = file.fileName
             updatedByUser = user
             updatedDateTime = new Timestamp(date.time)
         }

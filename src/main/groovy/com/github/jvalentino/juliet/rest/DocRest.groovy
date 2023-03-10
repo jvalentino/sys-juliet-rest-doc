@@ -1,5 +1,6 @@
 package com.github.jvalentino.juliet.rest
 
+import com.github.jvalentino.juliet.dto.DocDto
 import com.github.jvalentino.juliet.dto.DocListDto
 import com.github.jvalentino.juliet.dto.ResultDto
 import com.github.jvalentino.juliet.dto.ViewVersionDto
@@ -12,9 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.multipart.MultipartFile
 
 import javax.servlet.http.HttpServletResponse
 
@@ -42,7 +42,7 @@ class DocRest {
     }
 
     @PostMapping('/doc/upload/user/{userId}')
-    ResultDto upload(@RequestParam('file') MultipartFile file, @PathVariable(value='userId') Long userId) {
+    ResultDto upload(@RequestBody DocDto file, @PathVariable(value='userId') Long userId) {
         docService.uploadNewDoc(userId, file, DateGenerator.date())
         new ResultDto()
     }
@@ -80,7 +80,7 @@ class DocRest {
     }
 
     @PostMapping('/doc/version/new/{docId}/user/{userId}')
-    ResultDto upload(@RequestParam('file') MultipartFile file, @PathVariable(value='docId') Long docId,
+    ResultDto upload(@RequestBody DocDto file, @PathVariable(value='docId') Long docId,
                      @PathVariable(value='userId') Long userId) {
         docService.uploadNewVersion(userId, file, DateGenerator.date(), docId)
 

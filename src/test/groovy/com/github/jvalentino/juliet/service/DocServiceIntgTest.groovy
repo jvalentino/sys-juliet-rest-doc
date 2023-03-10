@@ -1,5 +1,6 @@
 package com.github.jvalentino.juliet.service
 
+import com.github.jvalentino.juliet.dto.DocDto
 import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.entity.Doc
 import com.github.jvalentino.juliet.entity.DocVersion
@@ -32,17 +33,15 @@ class DocServiceIntgTest extends BaseIntg {
         this.entityManager.persist(user)
 
         and:
-        MultipartFile file = GroovyMock()
+        DocDto file = new DocDto()
+        file.fileName = 'alpha.pdf'
+        file.bytes = [0]
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
 
         when:
         DocVersion result = docService.uploadNewDoc(user.authUserId, file, date)
 
         then:
-        _ * file.originalFilename >> 'alpha.pdf'
-        _ * file.bytes >> [0]
-
-        and:
         result.versionNum == 1
         result.data == [0]
         result.createdDateTime.time == date.time
@@ -74,17 +73,17 @@ class DocServiceIntgTest extends BaseIntg {
         this.entityManager.persist(doc)
 
         and:
-        MultipartFile file = GroovyMock()
+        DocDto file = new DocDto()
+        file.fileName = 'alpha.txt'
+        file.bytes = "hi".bytes
+
+        and:
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
 
         when:
         DocVersion result = docService.uploadNewVersion(user.authUserId, file, date, doc.docId)
 
         then:
-        _ * file.originalFilename >> 'alpha.txt'
-        _ * file.bytes >> "hi".bytes
-
-        and:
         doc.updatedDateTime.time == date.time
         new String(result.data) == 'hi'
         result.versionNum == 1
