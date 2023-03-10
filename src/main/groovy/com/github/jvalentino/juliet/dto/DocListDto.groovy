@@ -8,7 +8,7 @@ import groovy.transform.CompileDynamic
  * @author john.valentino
  */
 @CompileDynamic
-class DashboardDto {
+class DocListDto {
 
     List<Doc> documents = []
 

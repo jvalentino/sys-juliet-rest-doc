@@ -2,7 +2,6 @@ package com.github.jvalentino.juliet.rest
 
 import com.github.jvalentino.juliet.dto.ResultDto
 import com.github.jvalentino.juliet.entity.AuthUser
-import com.github.jvalentino.juliet.rest.UploadRest
 import com.github.jvalentino.juliet.service.DocService
 import com.github.jvalentino.juliet.util.DateGenerator
 import com.github.jvalentino.juliet.util.DateUtil
@@ -10,13 +9,13 @@ import org.springframework.web.multipart.MultipartFile
 import spock.lang.Specification
 import spock.lang.Subject
 
-class UploadRestTest extends Specification {
+class DocRestTest extends Specification {
 
     @Subject
-    UploadRest subject
+    DocRest subject
 
     def setup() {
-        subject = new UploadRest()
+        subject = new DocRest()
         subject.with {
             docService = Mock(DocService)
         }

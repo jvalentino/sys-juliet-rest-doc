@@ -1,12 +1,11 @@
 package com.github.jvalentino.juliet.rest
 
+import com.github.jvalentino.juliet.dto.DocListDto
 import com.github.jvalentino.juliet.dto.ViewVersionDto
 import com.github.jvalentino.juliet.entity.AuthUser
 import com.github.jvalentino.juliet.entity.Doc
 import com.github.jvalentino.juliet.entity.DocVersion
-import com.github.jvalentino.juliet.repo.AuthUserRepo
 import com.github.jvalentino.juliet.util.BaseIntg
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.web.servlet.MvcResult
 
 import java.sql.Timestamp
@@ -15,10 +14,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-class ViewVersionControllerIntgTest extends BaseIntg {
+class DocRestIntgTest extends BaseIntg {
 
-    @Autowired
-    AuthUserRepo authUserRepo
+    def "test dashboard"() {
+        when:
+        MvcResult response = mvc.perform(
+                get("/doc/all"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn()
+
+        then:
+        DocListDto result = this.toObject(response, DocListDto)
+        result.documents.size() == 0
+    }
 
     def "test versions"() {
         given:
@@ -53,7 +62,7 @@ class ViewVersionControllerIntgTest extends BaseIntg {
 
         when:
         MvcResult response = mvc.perform(
-                get("/view-versions/${doc.docId}"))
+                get("/doc/versions/${doc.docId}"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
@@ -99,7 +108,7 @@ class ViewVersionControllerIntgTest extends BaseIntg {
 
         when:
         MvcResult response = mvc.perform(
-                get("/version/download/${version.docVersionId}"))
+                get("/doc/version/download/${version.docVersionId}"))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
