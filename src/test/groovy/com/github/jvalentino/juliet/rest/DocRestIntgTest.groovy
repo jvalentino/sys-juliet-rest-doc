@@ -19,7 +19,7 @@ class DocRestIntgTest extends BaseIntg {
     def "test dashboard"() {
         when:
         MvcResult response = mvc.perform(
-                get("/doc/all/apikey/123"))
+                get("/doc/all").header('X-Auth-Token', '123'))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
@@ -27,6 +27,18 @@ class DocRestIntgTest extends BaseIntg {
         then:
         DocListDto result = this.toObject(response, DocListDto)
         result.documents.size() == 0
+    }
+
+    def "test unauthorized"() {
+        when:
+        MvcResult response = mvc.perform(
+                get("/doc/all"))
+                .andDo(print())
+                .andExpect(status().is(401))
+                .andReturn()
+
+        then:
+        true
     }
 
     def "test versions"() {
@@ -62,7 +74,7 @@ class DocRestIntgTest extends BaseIntg {
 
         when:
         MvcResult response = mvc.perform(
-                get("/doc/versions/${doc.docId}"))
+                get("/doc/versions/${doc.docId}").header('X-Auth-Token', '123'))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()
@@ -108,7 +120,7 @@ class DocRestIntgTest extends BaseIntg {
 
         when:
         MvcResult response = mvc.perform(
-                get("/doc/version/download/${version.docVersionId}"))
+                get("/doc/version/download/${version.docVersionId}").header('X-Auth-Token', '123'))
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn()

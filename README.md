@@ -498,3 +498,101 @@ You then declare the settings for each endpoint.
 }
 ```
 
+## API Key Security
+
+Since this is an API intended to be called only by an authorized party, we need at least some basic security. In this case, I am using the concept of an API Key. Specifically, every request will be expected to require the HTTP Header of `X-Auth-Token` with the appropriate value, at least when calling the explicitly secure services under `/doc`.
+
+### SwaggerConfiguration
+
+```groovy
+@Configuration
+@CompileDynamic
+@SuppressWarnings(['DuplicateStringLiteral'])
+class SwaggerConfiguration {
+
+    @Value('${spring.application.name}')
+    String appName
+
+    // https://stackoverflow.com/questions/63671676/
+    // springdoc-openapi-ui-add-jwt-header-parameter-to-generated-swagger
+    @Bean
+    OpenAPI customOpenAPI() {
+        new OpenAPI()
+                .info(new Info().title(appName).version('1.0.0'))
+                .components(new Components()
+                        .addSecuritySchemes('X-Auth-Token', new SecurityScheme()
+                                .type(SecurityScheme.Type.APIKEY)
+                                .in(SecurityScheme.In.HEADER)
+                                .name('X-Auth-Token')))
+                .addSecurityItem(new SecurityRequirement().addList('X-Auth-Token'))
+    }
+
+}
+```
+
+First we have to tell Swagger to put an "Authorize" button in its user interface, that we can use to provide this X-Auth-Token with every request.
+
+![01](wiki/authorize.png)
+
+![01](wiki/xauth.png)
+
+### SecurityFilter
+
+```groovy
+@Service
+@Configurable
+@CompileDynamic
+@Slf4j
+@SuppressWarnings(['UnnecessaryGetter'])
+class SecurityFilter extends GenericFilterBean {
+
+    @Value('${management.apikey}')
+    String apikey
+
+    @Value('${management.securePath}')
+    String securePath
+
+    void doFilter(
+            ServletRequest request,
+            ServletResponse response,
+            FilterChain chain) throws IOException, ServletException {
+        // pull the token out of the header
+        HttpServletRequest httpRequest = (HttpServletRequest) request
+        String token = httpRequest.getHeader('x-auth-token')
+        String pathInfo = httpRequest.getRequestURI()
+
+        if (!pathInfo.startsWith(securePath)) {
+            log.info("${pathInfo} is not secured")
+            chain.doFilter(request, response)
+            return
+        }
+
+        if (token != apikey) {
+            HttpServletResponse res = (HttpServletResponse) response
+            res.status = 401
+            return
+        }
+
+        chain.doFilter(request, response)
+    }
+
+}
+```
+
+Next we have to add an interceptor that gets called prior to every request. 
+
+- If that request is not /doc related, we ignore security
+- If that request is /doc related, we verify that it matches the expected key
+
+### application.properties
+
+```yaml
+spring:
+  application:
+    name: sys-juliet-rest-doc
+management:
+  apikey: 123
+  securePath: /doc
+```
+
+The involved properties were put in the application.properties, so that we can also change them at runtime from a deployment perspective.

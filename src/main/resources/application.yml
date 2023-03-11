@@ -1,5 +1,6 @@
 management:
   apikey: 123
+  securePath: /doc
   health:
     circuitbreakers:
       enabled: 'true'
@@ -13,6 +14,8 @@ management:
     health:
       show-details: always
 spring:
+  application:
+    name: sys-juliet-rest-doc
   jpa:
     generate-ddl: 'true'
     hibernate:
