@@ -15,7 +15,42 @@ Prerequisites
 
 All of these you can get in one command using this installation automation (if you are on a Mac): https://github.com/jvalentino/setup-automation
 
+# Contents
 
+- [Summary](#summary)
+  * [Database](#database)
+  * [IDE Testing](#ide-testing)
+  * [Runtime](#runtime)
+  * [Verification](#verification)
+  * [Strategy](#strategy)
+  * [Build](#build)
+- [Dev](#dev)
+  * [Prometheus](#prometheus)
+    + [build.gradle](#buildgradle)
+    + [application.properties](#applicationproperties)
+    + [SpringWebConfig](#springwebconfig)
+    + [WebSecurityConfig](#websecurityconfig)
+  * [Docker](#docker)
+    + [build-docker.sh](#build-dockersh)
+    + [Dockerfile](#dockerfile)
+    + [fluentbit.conf](#fluentbitconf)
+    + [start.sh](#startsh)
+  * [OpenAPI](#openapi)
+    + [build.gradle](#buildgradle-1)
+    + [SpringWebConfig](#springwebconfig-1)
+    + [application.properties](#applicationproperties-1)
+    + [UI](#ui)
+  * [Resilience4j](#resilience4j)
+    + [build.gradle](#buildgradle-2)
+    + [DocRest (Controller)](#docrest-controller)
+    + [application.yml](#applicationyml)
+    + [/actuator/health](#actuatorhealth)
+  * [API Key Security](#api-key-security)
+    + [SwaggerConfiguration](#swaggerconfiguration)
+    + [SecurityFilter](#securityfilter)
+    + [application.properties](#applicationproperties-2)
+
+# Summary
 
 ## Database
 

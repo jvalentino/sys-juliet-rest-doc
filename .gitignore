@@ -1,4 +1,5 @@
 *.log
+*.gz
 nohup.out
 HELP.md
 .gradle
