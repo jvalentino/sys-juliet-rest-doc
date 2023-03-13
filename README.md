@@ -112,7 +112,11 @@ The following builds the executable jar file:
 
 The following deploys the docker image to Kubernetes via Helm:
 
+```bash
+./deploy.sh
+```
 
+If it worked you can access it via http://localhost:8080/swagger-ui/index.html
 
 # Dev
 
