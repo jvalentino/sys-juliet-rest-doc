@@ -108,6 +108,12 @@ The following builds the executable jar file:
 
 
 
+## Deploy
+
+The following deploys the docker image to Kubernetes via Helm:
+
+
+
 # Dev
 
 ## Runtime Validation
