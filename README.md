@@ -1,6 +1,6 @@
 # System Juliet REST
 
-This application serves as the restful services as part of the overall https://github.com/jvalentino/sys-juliet project. For system level details, please see that location.
+This application serves as the restful services as part of the overall https://github.com/jvalentino/sys-juliet project as they relate to documents. For system level details, please see that location.
 
 Prerequisites
 
