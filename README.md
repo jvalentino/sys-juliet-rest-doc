@@ -1,4 +1,4 @@
-# System Juliet REST
+# System Juliet REST Doc
 
 This application serves as the restful services as part of the overall https://github.com/jvalentino/sys-juliet project as they relate to documents. For system level details, please see that location.
 
@@ -109,6 +109,72 @@ The following builds the executable jar file:
 
 
 # Dev
+
+## Runtime Validation
+
+The first step is to refresh the database to the expected default state:
+
+```bash
+./gradlew refreshDb
+```
+
+You need to specifically do this so you set the default admin account to username/password: `admin/37e098f0-b78d-4a48-adf1-e6c2568d4ea1`.
+
+It is then recommended you run thus application on port 8080, which can be done in two ways:
+
+**IDE**
+
+![01](./wiki/ide-1.png)
+
+**Command-Line**
+
+```bash
+java -jar --server.port=8080 build/libs/sys-juliet-rest-doc-0.0.1.jar
+```
+
+### Swagger UI
+
+The Swagger UI can then be accessed via http://localhost:8080/swagger-ui/index.html
+
+![01](./wiki/swagger-1.png)
+
+You are then going to want to set the authorization code to `123`, otherwise access will be defined. That is our default/testing API Key.
+
+![01](wiki/authorize.png)
+
+![01](wiki/xauth.png)
+
+### /doc/versions/{docId}
+
+Used for listing the versions of a specific document.
+
+![01](wiki/swagger-2.png)
+
+### /doc/version/download/{docVersionId}
+
+Used for downloading a specific document version.
+
+![01](wiki/swagger-3.png)
+
+### /doc/all
+
+User for listing al documents.
+
+![01](wiki/swagger-4.png)
+
+### /doc/upload/user/{userId}
+
+Used for uploading a new document, where that given document becomes the first version of it. The input is a file name and then a byte array: src/test/resources/doc-dto.json
+
+![01](wiki/swagger-5.png)
+
+### /doc/version/new/{docId}/user/{userId}
+
+This uploads a new version to an existing document. The input is a file name and then a byte array: src/test/resources/doc-dto.json
+
+![01](wiki/swagger-6.png)
+
+
 
 ## Prometheus
 
