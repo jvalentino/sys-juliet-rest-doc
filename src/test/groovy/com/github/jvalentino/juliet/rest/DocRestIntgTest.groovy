@@ -1,5 +1,6 @@
 package com.github.jvalentino.juliet.rest
 
+import com.github.jvalentino.juliet.dto.CountDto
 import com.github.jvalentino.juliet.dto.DocListDto
 import com.github.jvalentino.juliet.dto.ViewVersionDto
 import com.github.jvalentino.juliet.entity.AuthUser
@@ -39,6 +40,19 @@ class DocRestIntgTest extends BaseIntg {
 
         then:
         true
+    }
+
+    def "test count"() {
+        when:
+        MvcResult response = mvc.perform(
+                get("/doc/count").header('X-Auth-Token', '123'))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn()
+
+        then:
+        CountDto result = this.toObject(response, CountDto)
+        result.value == 0
     }
 
     def "test versions"() {

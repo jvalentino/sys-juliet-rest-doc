@@ -1,5 +1,6 @@
 package com.github.jvalentino.juliet.rest
 
+import com.github.jvalentino.juliet.dto.CountDto
 import com.github.jvalentino.juliet.dto.DocDto
 import com.github.jvalentino.juliet.dto.DocListDto
 import com.github.jvalentino.juliet.dto.ResultDto
@@ -43,6 +44,16 @@ class DocRest {
         }
 
         new ResponseEntity<DocListDto>(dashboard, HttpStatus.OK)
+    }
+
+    @GetMapping('/doc/count')
+    @CircuitBreaker(name = 'DocCount')
+    CountDto countDocs() {
+        CountDto result = new CountDto()
+        result.with {
+            value = docService.countDocuments()
+        }
+        result
     }
 
     @CircuitBreaker(name = 'DocUpload')
