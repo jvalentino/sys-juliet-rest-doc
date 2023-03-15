@@ -43,7 +43,7 @@ class DocServiceTest extends Specification {
         AuthUser user = new AuthUser(authUserId:123L)
         DocDto file = new DocDto()
         file.fileName = 'alpha.pdf'
-        file.bytes = 'bravo'.bytes
+        file.base64 = 'bravo'.bytes.encodeBase64()
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
 
         //println new File("./sample.pdf").bytes
@@ -101,7 +101,7 @@ class DocServiceTest extends Specification {
         AuthUser user = new AuthUser(authUserId:123L)
         DocDto file = new DocDto()
         file.fileName = 'alpha.pdf'
-        file.bytes = 'bravo'.bytes
+        file.base64 = 'bravo'.bytes.encodeBase64()
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
         Long docId = 1L
 

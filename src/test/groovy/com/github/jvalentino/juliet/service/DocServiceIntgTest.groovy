@@ -35,7 +35,7 @@ class DocServiceIntgTest extends BaseIntg {
         and:
         DocDto file = new DocDto()
         file.fileName = 'alpha.pdf'
-        file.bytes = [0]
+        file.base64 = 'hi'.bytes.encodeBase64()
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')
 
         when:
@@ -43,7 +43,7 @@ class DocServiceIntgTest extends BaseIntg {
 
         then:
         result.versionNum == 1
-        result.data == [0]
+        new String(result.data) == 'hi'
         result.createdDateTime.time == date.time
         result.createdByUser == user
     }
@@ -75,7 +75,7 @@ class DocServiceIntgTest extends BaseIntg {
         and:
         DocDto file = new DocDto()
         file.fileName = 'alpha.txt'
-        file.bytes = "hi".bytes
+        file.base64 = "hi".bytes.encodeBase64()
 
         and:
         Date date = DateUtil.toDate('2022-10-31T00:00:00.000+0000')

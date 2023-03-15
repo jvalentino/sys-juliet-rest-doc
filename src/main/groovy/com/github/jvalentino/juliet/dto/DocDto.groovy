@@ -9,6 +9,7 @@ import groovy.transform.CompileDynamic
 class DocDto {
 
     String fileName
-    byte[] bytes
+    String base64
+    String mimeType
 
 }

@@ -1,6 +1,7 @@
 package com.github.jvalentino.juliet.rest
 
 import com.github.jvalentino.juliet.dto.CountDto
+import com.github.jvalentino.juliet.dto.DocDto
 import com.github.jvalentino.juliet.dto.DocListDto
 import com.github.jvalentino.juliet.dto.ViewVersionDto
 import com.github.jvalentino.juliet.entity.AuthUser
@@ -140,9 +141,8 @@ class DocRestIntgTest extends BaseIntg {
                 .andReturn()
 
         then:
-        response
-        response.response.contentType == 'text/plain'
-        new String(response.response.getContentAsByteArray()) == 'this is a test'
+        DocDto result = this.toObject(response, DocDto)
+        new String(result.base64.decodeBase64()) == 'this is a test'
 
     }
 

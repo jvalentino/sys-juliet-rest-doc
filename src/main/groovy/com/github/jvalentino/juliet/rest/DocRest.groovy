@@ -5,7 +5,6 @@ import com.github.jvalentino.juliet.dto.DocDto
 import com.github.jvalentino.juliet.dto.DocListDto
 import com.github.jvalentino.juliet.dto.ResultDto
 import com.github.jvalentino.juliet.dto.ViewVersionDto
-import com.github.jvalentino.juliet.entity.DocVersion
 import com.github.jvalentino.juliet.service.DocService
 import com.github.jvalentino.juliet.util.DateGenerator
 import groovy.transform.CompileDynamic
@@ -19,8 +18,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-
-import javax.servlet.http.HttpServletResponse
 
 /**
  * The general rest endpoint for accessing all document related things.
@@ -79,22 +76,8 @@ class DocRest {
     // https://www.baeldung.com/servlet-download-file
     @CircuitBreaker(name = 'DocDownload')
     @GetMapping('/doc/version/download/{docVersionId}')
-    void downloadVersion(@PathVariable(value='docVersionId') Long docVersionId, HttpServletResponse response) {
-        DocVersion version = docService.retrieveVersion(docVersionId)
-
-        response.setContentType(version.doc.mimeType)
-        response.setHeader('Content-disposition',
-                "attachment; filename=${version.doc.name.replaceAll(' ', '')}")
-
-        InputStream is = new ByteArrayInputStream(version.data)
-        OutputStream out = response.getOutputStream()
-
-        byte[] buffer = new byte[1048]
-
-        int numBytesRead
-        while ((numBytesRead = is.read(buffer)) > 0) {
-            out.write(buffer, 0, numBytesRead)
-        }
+    DocDto downloadVersion(@PathVariable(value='docVersionId') Long docVersionId) {
+        docService.retrieveVersion(docVersionId)
     }
 
     @CircuitBreaker(name = 'DocVersionNew')

@@ -54,7 +54,7 @@ class DocService {
         DocVersion version = new DocVersion()
         version.with {
             doc = parentDoc
-            data = file.bytes
+            data = file.base64.decodeBase64()
             createdDateTime = new Timestamp(date.time)
             createdByUser = user
             versionNum = 1
@@ -72,9 +72,15 @@ class DocService {
         doc
     }
 
-    DocVersion retrieveVersion(Long docVersionId) {
+    DocDto retrieveVersion(Long docVersionId) {
         DocVersion version = docVersionRepo.getWithParent(docVersionId).first()
-        version
+        DocDto result = new DocDto()
+        result.with {
+            fileName = version.doc.name
+            mimeType = version.doc.mimeType
+            base64 = version.data.encodeBase64()
+        }
+        result
     }
 
     DocVersion uploadNewVersion(Long userId, DocDto file, Date date, Long docId) {
@@ -93,7 +99,7 @@ class DocService {
         DocVersion version = new DocVersion()
         version.with {
             doc = parentDoc
-            data = file.bytes
+            data = file.base64.decodeBase64()
             createdDateTime = new Timestamp(date.time)
             createdByUser = user
             versionNum = currentCount + 1
